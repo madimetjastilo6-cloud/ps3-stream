@@ -1,18 +1,20 @@
 name: Build PS3 PKG
 
-on: [push]
+on:
+  push:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Install tools
         run: |
           sudo apt update
-          sudo apt install -y git build-essential python3
+          sudo apt install -y git build-essential python3 libelf-dev
 
       - name: Install PS3 toolchain
         run: |
@@ -20,15 +22,20 @@ jobs:
           cd ps3toolchain
           ./toolchain.sh
 
-      - name: Build
+      - name: Set environment
         run: |
-          export PS3DEV=/usr/local/ps3dev
-          export PSL1GHT=$PS3DEV/psl1ght
-          export PATH=$PATH:$PS3DEV/bin:$PS3DEV/ppu/bin:$PS3DEV/spu/bin
+          echo "PS3DEV=/usr/local/ps3dev" >> $GITHUB_ENV
+          echo "PSL1GHT=/usr/local/ps3dev/psl1ght" >> $GITHUB_ENV
+          echo "/usr/local/ps3dev/bin" >> $GITHUB_PATH
+          echo "/usr/local/ps3dev/ppu/bin" >> $GITHUB_PATH
+          echo "/usr/local/ps3dev/spu/bin" >> $GITHUB_PATH
+
+      - name: Build project
+        run: |
           make
           make pkg
 
-      - name: Upload
+      - name: Upload PKG
         uses: actions/upload-artifact@v4
         with:
           name: ps3-pkg
