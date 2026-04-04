@@ -1,0 +1,35 @@
+name: Build PS3 PKG
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install tools
+        run: |
+          sudo apt update
+          sudo apt install -y git build-essential python3
+
+      - name: Install PS3 toolchain
+        run: |
+          git clone https://github.com/ps3dev/ps3toolchain.git
+          cd ps3toolchain
+          ./toolchain.sh
+
+      - name: Build
+        run: |
+          export PS3DEV=/usr/local/ps3dev
+          export PSL1GHT=$PS3DEV/psl1ght
+          export PATH=$PATH:$PS3DEV/bin:$PS3DEV/ppu/bin:$PS3DEV/spu/bin
+          make
+          make pkg
+
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ps3-pkg
+          path: "*.pkg"
