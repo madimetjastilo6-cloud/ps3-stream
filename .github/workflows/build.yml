@@ -14,7 +14,7 @@ jobs:
       - name: Install tools
         run: |
           sudo apt update
-          sudo apt install -y git build-essential python3 libelf-dev
+          sudo apt install -y git build-essential python3 libelf-dev libtool 
 
       - name: Install PS3 toolchain
         run: |
