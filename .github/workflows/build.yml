@@ -7,6 +7,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      PS3DEV: /usr/local/ps3dev
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,10 +22,6 @@ jobs:
             autoconf automake bison flex texinfo libncurses5-dev patch subversion wget \
             zlib1g-dev libelf-dev libtool libtool-bin bzip2 libgmp3-dev pkg-config \
             g++ libssl-dev clang
-
-      # 🔥 FIX: set PS3DEV BEFORE installing toolchain
-      - name: Set PS3DEV
-        run: echo "PS3DEV=/usr/local/ps3dev" >> $GITHUB_ENV
 
       - name: Install PS3 toolchain
         run: |
@@ -40,13 +39,6 @@ jobs:
       - name: Build project
         run: |
           make
-          make pkg
-
-      - name: Upload PKG
-        uses: actions/upload-artifact@v4
-        with:
-          name: ps3-pkg
-          path: "*.pkg"
           make pkg
 
       - name: Upload PKG
